@@ -1,0 +1,14 @@
+apiVersion: v2
+name: tempo
+description: Grafana Tempo Single Binary Mode
+type: application
+version: 2.0.0
+appVersion: 2.10.1
+home: https://grafana.net
+icon: https://raw.githubusercontent.com/grafana/tempo/main/cmd/tempo/app/static/tempo-icon.png
+sources:
+  - https://github.com/grafana/tempo
+maintainers:
+  - name: Mohammad Abubaker
+    email: sheikhabubaker761@gmail.com
+    url: https://github.com/Sheikh-Abubaker
