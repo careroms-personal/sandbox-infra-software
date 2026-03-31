@@ -227,6 +227,13 @@ minio:
       memory: 256Mi
     limits:
       memory: 512Mi
+  makeBucketJob:
+    tolerations:
+      - key: node-role
+        operator: Exists
+        effect: NoSchedule
+    nodeSelector:
+      node-role: monitor
 
 alertmanager:
   enabled: false
