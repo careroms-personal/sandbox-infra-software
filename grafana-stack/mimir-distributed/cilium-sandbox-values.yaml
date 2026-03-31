@@ -10,6 +10,10 @@ mimir:
     ingest_storage:
       enabled: false
 
+    # re-enable push gRPC — required when ingest_storage is disabled
+    ingester:
+      push_grpc_method_enabled: true
+
     # combined limits block — ingestion caps + retention
     limits:
       ingestion_rate: 10000
