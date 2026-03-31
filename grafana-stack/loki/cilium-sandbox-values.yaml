@@ -6,39 +6,36 @@ deploymentMode: SingleBinary
 loki:
   auth_enabled: false
 
-  structuredConfig:
-    limits_config:
-      # hard ingestion limits
-      ingestion_rate_mb: 8
-      ingestion_burst_size_mb: 16
-      max_streams_per_user: 10000
-      max_line_size: 256kb
-      # retention
-      retention_period: 90d
+  limits_config:
+    ingestion_rate_mb: 8
+    ingestion_burst_size_mb: 16
+    max_streams_per_user: 10000
+    max_line_size: 262144
+    retention_period: 90d
 
-    compactor:
-      retention_enabled: true
-      delete_request_store: filesystem
+  compactor:
+    retention_enabled: true
+    delete_request_store: filesystem
 
-    common:
-      replication_factor: 1
+  commonConfig:
+    replication_factor: 1
 
-    schema_config:
-      configs:
-        - from: "2024-01-01"
-          store: tsdb
-          object_store: filesystem
-          schema: v13
-          index:
-            prefix: index_
-            period: 24h
+  schemaConfig:
+    configs:
+      - from: "2024-01-01"
+        store: tsdb
+        object_store: filesystem
+        schema: v13
+        index:
+          prefix: index_
+          period: 24h
 
-    storage_config:
-      tsdb_shipper:
-        active_index_directory: /var/loki/index
-        cache_location: /var/loki/index_cache
-      filesystem:
-        directory: /var/loki/chunks
+  storage:
+    type: filesystem
+    bucketNames:
+      chunks: chunks
+      ruler: ruler
+      admin: admin
 
 # --- single binary: 1 replica ---
 singleBinary:
