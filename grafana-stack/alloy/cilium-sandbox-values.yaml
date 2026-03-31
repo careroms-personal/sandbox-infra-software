@@ -1,0 +1,22 @@
+# Alloy — Cilium Sandbox Values
+
+alloy:
+  # disable anonymous usage reporting
+  enableReporting: false
+
+  # mount host log paths for log collection
+  mounts:
+    varlog: true
+    dockercontainers: true
+
+  # stability level — keep at generally-available for sandbox
+  stabilityLevel: "generally-available"
+
+controller:
+  # daemonset so Alloy runs on every node (needed for log/metric collection)
+  type: daemonset
+
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule

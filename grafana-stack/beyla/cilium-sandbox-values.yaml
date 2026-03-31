@@ -1,0 +1,37 @@
+# Beyla — Cilium Sandbox Values
+
+# application preset: eBPF auto-instrumentation for HTTP, gRPC, DB calls
+preset: application
+
+tolerations:
+  - key: node-role
+    operator: Exists
+    effect: NoSchedule
+
+# enable ServiceMonitor so Prometheus scrapes Beyla's own metrics
+serviceMonitor:
+  enabled: true
+
+config:
+  create: true
+  data:
+    attributes:
+      kubernetes:
+        enable: true
+
+    # send traces via OTLP to Alloy
+    otel_traces_export:
+      endpoint: http://alloy.monitoring.svc.cluster.local:4318
+
+    # expose metrics for Prometheus scraping
+    prometheus_export:
+      port: 9090
+      path: /metrics
+
+    # filter out noise from infra components
+    filter:
+      network:
+        k8s_dst_owner_name:
+          not_match: '{kube*,*prometheus*,*alloy*,*grafana*}'
+        k8s_src_owner_name:
+          not_match: '{kube*,*prometheus*,*alloy*,*grafana*}'

@@ -1,0 +1,59 @@
+# Grafana — Cilium Sandbox Values
+
+adminUser: admin
+adminPassword: "Sandbox5555"
+
+tolerations:
+  - key: node-role
+    operator: Exists
+    effect: NoSchedule
+
+nodeSelector:
+  node-role: monitor
+
+# persist dashboards and settings
+persistence:
+  enabled: true
+  size: 5Gi
+  accessModes:
+    - ReadWriteOnce
+
+# auto-load dashboards from kube-prometheus-stack ConfigMaps
+sidecar:
+  dashboards:
+    enabled: true
+    label: grafana_dashboard
+    labelValue: "1"
+    searchNamespace: ALL
+  datasources:
+    enabled: true
+    label: grafana_datasource
+    labelValue: "1"
+    searchNamespace: ALL
+
+# datasources
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+        isDefault: false
+        access: proxy
+
+      - name: Mimir
+        type: prometheus
+        url: http://mimir.monitoring.svc.cluster.local:9009/prometheus
+        isDefault: true
+        access: proxy
+
+      - name: Loki
+        type: loki
+        url: http://loki.monitoring.svc.cluster.local:3100
+        access: proxy
+
+      - name: Tempo
+        type: tempo
+        url: http://tempo.monitoring.svc.cluster.local:3100
+        access: proxy

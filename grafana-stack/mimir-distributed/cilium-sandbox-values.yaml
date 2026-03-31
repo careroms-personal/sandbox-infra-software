@@ -1,0 +1,212 @@
+# Mimir — Cilium Sandbox Values
+# Monolithic-style: single replicas, no caches, hard limits to prevent memory bloat
+
+# disable multi-tenancy — single tenant sandbox
+mimir:
+  structuredConfig:
+    multitenancy_enabled: false
+
+    # hard ingestion limits to prevent series explosion
+    limits:
+      ingestion_rate: 10000
+      ingestion_burst_size: 20000
+      max_global_series_per_user: 100000
+      max_fetched_chunks_per_query: 100000
+
+    # compaction settings to keep TSDB head small
+    blocks_storage:
+      tsdb:
+        retention_period: 2h       # flush to object store every 2h
+        head_compaction_interval: 30m
+
+    # long-term retention — 6 months for ML dataset usage
+    compactor:
+      blocks_retention_period: 180d
+
+# --- disable all caches (main cause of memory bloat) ---
+admin-cache:
+  enabled: false
+
+chunks-cache:
+  enabled: false
+
+index-cache:
+  enabled: false
+
+metadata-cache:
+  enabled: false
+
+results-cache:
+  enabled: false
+
+# --- MinIO for local object storage ---
+minio:
+  enabled: true
+  persistence:
+    size: 100Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
+
+# --- single replicas with hard memory limits ---
+ingester:
+  replicas: 1
+  zoneAwareReplication:
+    enabled: false
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      memory: 2Gi
+  persistentVolume:
+    size: 20Gi
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+  nodeSelector:
+    node-role: monitor
+
+distributor:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+  nodeSelector:
+    node-role: monitor
+
+querier:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+  nodeSelector:
+    node-role: monitor
+
+query_frontend:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+  nodeSelector:
+    node-role: monitor
+
+store_gateway:
+  replicas: 1
+  zoneAwareReplication:
+    enabled: false
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+  persistentVolume:
+    size: 10Gi
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+  nodeSelector:
+    node-role: monitor
+
+compactor:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+  persistentVolume:
+    size: 10Gi
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+  nodeSelector:
+    node-role: monitor
+
+ruler:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 512Mi
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+  nodeSelector:
+    node-role: monitor
+
+overrides_exporter:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      memory: 128Mi
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+  nodeSelector:
+    node-role: monitor
+
+gateway:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      memory: 256Mi
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+  nodeSelector:
+    node-role: monitor
+
+alertmanager:
+  enabled: false
+  replicas: 1
+  statefulSet:
+    enabled: true
+  persistentVolume:
+    enabled: true
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+  nodeSelector:
+    node-role: monitor

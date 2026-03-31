@@ -1,0 +1,99 @@
+# kube-prometheus-stack — Cilium Sandbox Values
+# Overview: enabled/disabled components before deep config
+
+# --- Grafana: disabled (standalone Grafana used instead) ---
+grafana:
+  enabled: false
+
+# --- Alertmanager: enabled ---
+alertmanager:
+  enabled: true
+  alertmanagerSpec:
+    tolerations:
+      - key: node-role
+        operator: Exists
+        effect: NoSchedule
+    nodeSelector:
+      node-role: monitor
+
+# --- Prometheus: enabled (for query UI + alerting) ---
+prometheus:
+  enabled: true
+  prometheusSpec:
+    tolerations:
+      - key: node-role
+        operator: Exists
+        effect: NoSchedule
+    nodeSelector:
+      node-role: monitor
+    retention: 7d
+    retentionSize: ""
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+
+# --- Node Exporter: enabled ---
+nodeExporter:
+  enabled: true
+
+prometheus-node-exporter:
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+
+# --- kube-state-metrics: enabled ---
+kubeStateMetrics:
+  enabled: true
+
+kube-state-metrics:
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+  nodeSelector:
+    node-role: monitor
+
+# --- kubeProxy: disabled (Cilium replaces kube-proxy) ---
+kubeProxy:
+  enabled: false
+
+# --- coreDns: enabled ---
+coreDns:
+  enabled: true
+
+# --- kubeDns: disabled (using CoreDNS, not kube-dns) ---
+kubeDns:
+  enabled: false
+
+# --- kubeEtcd: enabled ---
+kubeEtcd:
+  enabled: true
+
+# --- kubeControllerManager: enabled ---
+kubeControllerManager:
+  enabled: true
+
+# --- kubeScheduler: enabled ---
+kubeScheduler:
+  enabled: true
+
+# --- kubeApiServer: enabled ---
+kubeApiServer:
+  enabled: true
+
+# --- kubelet: enabled ---
+kubelet:
+  enabled: true
+
+# --- Windows monitoring: disabled (Linux sandbox only) ---
+windowsMonitoring:
+  enabled: false
+
+# --- Thanos Ruler: disabled (not needed) ---
+thanosRuler:
+  enabled: false
