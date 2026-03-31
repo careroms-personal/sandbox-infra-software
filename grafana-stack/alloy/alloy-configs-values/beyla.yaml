@@ -1,0 +1,38 @@
+extraObjects:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: alloy-beyla-config
+      namespace: grafana-stack
+    data:
+      beyla.alloy: |
+        // Beyla pipeline — receives OTLP from Beyla, forwards traces to Tempo and metrics to Mimir
+
+        otelcol.receiver.otlp "beyla" {
+          grpc {
+            endpoint = "0.0.0.0:4317"
+          }
+          http {
+            endpoint = "0.0.0.0:4318"
+          }
+
+          output {
+            traces  = [otelcol.exporter.otlp.tempo.input]
+            metrics = [otelcol.exporter.prometheusremotewrite.mimir.input]
+          }
+        }
+
+        otelcol.exporter.otlp "tempo" {
+          client {
+            endpoint = "grafana-tempo.grafana-stack.svc.cluster.local:4317"
+            tls {
+              insecure = true
+            }
+          }
+        }
+
+        otelcol.exporter.prometheusremotewrite "mimir" {
+          endpoint {
+            url = "http://grafana-mimir-gateway.grafana-stack.svc.cluster.local:80/api/v1/push"
+          }
+        }

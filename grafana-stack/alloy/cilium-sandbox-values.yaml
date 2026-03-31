@@ -1,22 +1,60 @@
 # Alloy — Cilium Sandbox Values
 
 alloy:
-  # disable anonymous usage reporting
   enableReporting: false
+  stabilityLevel: "generally-available"
 
-  # mount host log paths for log collection
+  configMap:
+    content: |
+      logging {
+        level  = "info"
+        format = "logfmt"
+      }
+
+      import.file "beyla" {
+        filename = "/etc/alloy/beyla.alloy"
+      }
+
+      import.file "node_exporter" {
+        filename = "/etc/alloy/node-exporter.alloy"
+      }
+
   mounts:
     varlog: true
     dockercontainers: true
+    extra:
+      - name: beyla-config
+        mountPath: /etc/alloy/beyla.alloy
+        subPath: beyla.alloy
+        readOnly: true
+      - name: node-exporter-config
+        mountPath: /etc/alloy/node-exporter.alloy
+        subPath: node-exporter.alloy
+        readOnly: true
 
-  # stability level — keep at generally-available for sandbox
-  stabilityLevel: "generally-available"
+  extraPorts:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+      protocol: TCP
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+      protocol: TCP
 
 controller:
-  # daemonset so Alloy runs on every node (needed for log/metric collection)
   type: daemonset
 
   tolerations:
     - key: node-role
       operator: Exists
       effect: NoSchedule
+
+  volumes:
+    extra:
+      - name: beyla-config
+        configMap:
+          name: alloy-beyla-config
+      - name: node-exporter-config
+        configMap:
+          name: alloy-node-exporter-config
