@@ -37,10 +37,8 @@ tempo:
 
   # ingestion limits
   overrides:
-    defaults:
-      ingestion:
-        max_traces_per_user: 100000
-        max_bytes_per_trace: 5000000   # 5MB max per trace
+    max_traces_per_user: 100000
+    max_bytes_per_trace: 5000000   # 5MB max per trace
 
   storage:
     trace:
