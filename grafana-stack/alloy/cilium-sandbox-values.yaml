@@ -12,11 +12,11 @@ alloy:
       }
 
       import.file "beyla" {
-        filename = "/etc/alloy/beyla.alloy"
+        filename = "/etc/alloy-extra/beyla.alloy"
       }
 
       import.file "node_exporter" {
-        filename = "/etc/alloy/node-exporter.alloy"
+        filename = "/etc/alloy-extra/node-exporter.alloy"
       }
 
   mounts:
@@ -24,11 +24,11 @@ alloy:
     dockercontainers: true
     extra:
       - name: beyla-config
-        mountPath: /etc/alloy/beyla.alloy
+        mountPath: /etc/alloy-extra/beyla.alloy
         subPath: beyla.alloy
         readOnly: true
       - name: node-exporter-config
-        mountPath: /etc/alloy/node-exporter.alloy
+        mountPath: /etc/alloy-extra/node-exporter.alloy
         subPath: node-exporter.alloy
         readOnly: true
 
