@@ -58,6 +58,19 @@ kube-state-metrics:
   nodeSelector:
     node-role: monitor
 
+# --- Prometheus Operator ---
+prometheusOperator:
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+  admissionWebhooks:
+    patch:
+      tolerations:
+        - key: node-role
+          operator: Exists
+          effect: NoSchedule
+
 # --- kubeProxy: disabled (Cilium replaces kube-proxy) ---
 kubeProxy:
   enabled: false
