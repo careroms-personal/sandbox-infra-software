@@ -6,22 +6,18 @@ mimir:
   structuredConfig:
     multitenancy_enabled: false
 
-    # hard ingestion limits to prevent series explosion
+    # combined limits block — ingestion caps + retention
     limits:
       ingestion_rate: 10000
       ingestion_burst_size: 20000
       max_global_series_per_user: 100000
       max_fetched_chunks_per_query: 100000
+      compactor_blocks_retention_period: 180d
 
     # compaction settings to keep TSDB head small
     blocks_storage:
       tsdb:
-        retention_period: 2h       # flush to object store every 2h
         head_compaction_interval: 30m
-
-    # long-term retention — 6 months for ML dataset usage
-    compactor:
-      retention_period: 180d
 
 # --- disable all caches (main cause of memory bloat) ---
 admin-cache:
@@ -44,12 +40,25 @@ minio:
   enabled: true
   persistence:
     size: 100Gi
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+  nodeSelector:
+    node-role: monitor
   resources:
     requests:
       cpu: 100m
       memory: 256Mi
     limits:
       memory: 512Mi
+  makeBucketJob:
+    tolerations:
+      - key: node-role
+        operator: Exists
+        effect: NoSchedule
+    nodeSelector:
+      node-role: monitor
 
 # --- single replicas with hard memory limits ---
 ingester:
@@ -210,30 +219,6 @@ rollout_operator:
 
 kafka:
   enabled: false
-
-minio:
-  enabled: true
-  persistence:
-    size: 100Gi
-  tolerations:
-    - key: node-role
-      operator: Exists
-      effect: NoSchedule
-  nodeSelector:
-    node-role: monitor
-  resources:
-    requests:
-      cpu: 100m
-      memory: 256Mi
-    limits:
-      memory: 512Mi
-  makeBucketJob:
-    tolerations:
-      - key: node-role
-        operator: Exists
-        effect: NoSchedule
-    nodeSelector:
-      node-role: monitor
 
 alertmanager:
   enabled: false
