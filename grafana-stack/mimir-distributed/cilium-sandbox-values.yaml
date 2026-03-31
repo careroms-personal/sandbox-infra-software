@@ -21,7 +21,7 @@ mimir:
 
     # long-term retention — 6 months for ML dataset usage
     compactor:
-      blocks_retention_period: 180d
+      retention_period: 180d
 
 # --- disable all caches (main cause of memory bloat) ---
 admin-cache:
@@ -196,6 +196,37 @@ gateway:
       effect: NoSchedule
   nodeSelector:
     node-role: monitor
+
+query_scheduler:
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+  nodeSelector:
+    node-role: monitor
+
+rollout_operator:
+  enabled: false
+
+kafka:
+  enabled: false
+
+minio:
+  enabled: true
+  persistence:
+    size: 100Gi
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+  nodeSelector:
+    node-role: monitor
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
 
 alertmanager:
   enabled: false
