@@ -3,7 +3,7 @@ extraObjects:
     kind: ConfigMap
     metadata:
       name: alloy-beyla-config
-      namespace: grafana-stack
+      namespace: grafana-stack-daemonsets
     data:
       beyla.alloy: |
         // Beyla pipeline — receives OTLP from Beyla, forwards traces to Tempo and metrics to Mimir

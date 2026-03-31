@@ -5,7 +5,7 @@ extraObjects:
     kind: ConfigMap
     metadata:
       name: alloy-node-exporter-config
-      namespace: grafana-stack
+      namespace: grafana-stack-daemonsets
     data:
       node-exporter.alloy: |
         discovery.kubernetes "node_exporter" {
