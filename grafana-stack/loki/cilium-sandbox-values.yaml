@@ -56,6 +56,14 @@ singleBinary:
     limits:
       memory: 1Gi
 
+gateway:
+  tolerations:
+    - key: node-role
+      operator: Exists
+      effect: NoSchedule
+  nodeSelector:
+    node-role: monitor
+
 # --- disable all caches (main cause of memory bloat) ---
 chunksCache:
   enabled: false
