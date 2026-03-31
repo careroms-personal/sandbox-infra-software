@@ -21,7 +21,7 @@ config:
 
     # send traces via OTLP to Alloy
     otel_traces_export:
-      endpoint: http://alloy.monitoring.svc.cluster.local:4318
+      endpoint: http://grafana-alloy.grafana-stack.svc.cluster.local:4318
 
     # expose metrics for Prometheus scraping
     prometheus_export:
