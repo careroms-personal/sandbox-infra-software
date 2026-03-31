@@ -67,6 +67,13 @@ minio:
         effect: NoSchedule
     nodeSelector:
       node-role: monitor
+  postJob:
+    tolerations:
+      - key: node-role
+        operator: Exists
+        effect: NoSchedule
+    nodeSelector:
+      node-role: monitor
 
 # --- single replicas with hard memory limits ---
 ingester:
