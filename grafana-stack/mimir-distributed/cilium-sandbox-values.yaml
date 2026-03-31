@@ -25,7 +25,7 @@ mimir:
     # compaction settings to keep TSDB head small
     blocks_storage:
       tsdb:
-        head_compaction_interval: 30m
+        head_compaction_interval: 15m
 
 # --- disable all caches (main cause of memory bloat) ---
 admin-cache:
