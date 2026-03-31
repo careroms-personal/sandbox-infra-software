@@ -65,11 +65,9 @@ prometheusOperator:
       operator: Exists
       effect: NoSchedule
   admissionWebhooks:
+    enabled: false
     patch:
-      tolerations:
-        - key: node-role
-          operator: Exists
-          effect: NoSchedule
+      enabled: false
 
 # --- kubeProxy: disabled (Cilium replaces kube-proxy) ---
 kubeProxy:

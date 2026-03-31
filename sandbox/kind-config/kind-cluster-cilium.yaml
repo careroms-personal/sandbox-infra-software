@@ -1,0 +1,67 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: d2d-cilium-sandbox
+networking:
+  disableDefaultCNI: true  # disable kindnet — Cilium will be the CNI
+  kubeProxyMode: none      # disable kube-proxy — Cilium handles this
+nodes:
+  - role: control-plane
+    extraMounts:
+      - hostPath: /home/neroroms/.kind
+        containerPath: /var/local-path-provisioner
+  - role: worker
+    extraMounts:
+      - hostPath: /home/neroroms/.kind
+        containerPath: /var/local-path-provisioner
+    labels:
+      node-role: app
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          taints:
+            - key: node-role
+              value: app
+              effect: NoSchedule
+  - role: worker
+    extraMounts:
+      - hostPath: /home/neroroms/.kind
+        containerPath: /var/local-path-provisioner
+    labels:
+      node-role: app
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          taints:
+            - key: node-role
+              value: app
+              effect: NoSchedule
+  - role: worker
+    extraMounts:
+      - hostPath: /home/neroroms/.kind
+        containerPath: /var/local-path-provisioner
+    labels:
+      node-role: monitor
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          taints:
+            - key: node-role
+              value: monitor
+              effect: NoSchedule
+  - role: worker
+    extraMounts:
+      - hostPath: /home/neroroms/.kind
+        containerPath: /var/local-path-provisioner
+    labels:
+      node-role: monitor
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          taints:
+            - key: node-role
+              value: monitor
+              effect: NoSchedule

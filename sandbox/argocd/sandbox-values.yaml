@@ -1,0 +1,80 @@
+global:
+  tolerations:
+    - key: node-role
+      value: app
+      effect: NoSchedule
+  nodeSelector:
+    node-role: app
+
+server:
+  tolerations:
+    - key: node-role
+      value: app
+      effect: NoSchedule
+  nodeSelector:
+    node-role: app
+
+controller:
+  tolerations:
+    - key: node-role
+      value: app
+      effect: NoSchedule
+  nodeSelector:
+    node-role: app
+
+repoServer:
+  tolerations:
+    - key: node-role
+      value: app
+      effect: NoSchedule
+  nodeSelector:
+    node-role: app
+  existingVolumes:
+    gpgKeyring:
+      persistentVolumeClaim:
+        claimName: pvc-argocd-repo-gpg
+    helmWorkingDir:
+      persistentVolumeClaim:
+        claimName: pvc-argocd-repo-helm
+    tmp:
+      persistentVolumeClaim:
+        claimName: pvc-argocd-repo-tmp
+
+redis:
+  tolerations:
+    - key: node-role
+      value: app
+      effect: NoSchedule
+  nodeSelector:
+    node-role: app
+  volumes:
+    - name: redis-data
+      persistentVolumeClaim:
+        claimName: pvc-argocd-redis
+  volumeMounts:
+    - name: redis-data
+      mountPath: /data
+
+applicationSet:
+  tolerations:
+    - key: node-role
+      value: app
+      effect: NoSchedule
+  nodeSelector:
+    node-role: app
+
+notifications:
+  tolerations:
+    - key: node-role
+      value: app
+      effect: NoSchedule
+  nodeSelector:
+    node-role: app
+
+dex:
+  tolerations:
+    - key: node-role
+      value: app
+      effect: NoSchedule
+  nodeSelector:
+    node-role: app
