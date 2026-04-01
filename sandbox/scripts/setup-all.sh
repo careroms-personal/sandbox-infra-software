@@ -109,5 +109,5 @@ fi
 
 echo ""
 echo "✅ Tool installation complete."
-echo "   Run ./setup-sandbox.sh        for normal sandbox"
-echo "   Run ./setup-cilium-sandbox.sh for Cilium sandbox"
+echo "   Run scripts/setup-sandbox.sh        for normal sandbox"
+echo "   Run scripts/setup-cilium-sandbox.sh for Cilium sandbox"
