@@ -64,6 +64,8 @@ prometheusOperator:
     - key: node-role
       operator: Exists
       effect: NoSchedule
+  tls:
+    enabled: false
   admissionWebhooks:
     enabled: false
     patch:
