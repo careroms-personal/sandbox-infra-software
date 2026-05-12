@@ -5,7 +5,7 @@ extraObjects:
     kind: ConfigMap
     metadata:
       name: alloy-beyla-config
-      namespace: grafana-stack-daemonsets
+      namespace: grafana
     data:
       beyla.alloy: |
         // Beyla pipeline — receives OTLP from Beyla, forwards traces to Tempo and metrics to Mimir
@@ -26,7 +26,7 @@ extraObjects:
 
         otelcol.exporter.otlp "tempo" {
           client {
-            endpoint = "grafana-tempo.grafana-stack.svc.cluster.local:4317"
+            endpoint = "grafana-tempo.svc.cluster.local:4317"
             tls {
               insecure = true
             }
@@ -35,7 +35,7 @@ extraObjects:
 
         otelcol.exporter.prometheusremotewrite "mimir" {
           endpoint {
-            url = "http://grafana-mimir-gateway.grafana-stack.svc.cluster.local:80/api/v1/push"
+            url = "http://grafana-mimir-gateway.svc.cluster.local:80/api/v1/push"
           }
         }
 
@@ -43,7 +43,7 @@ extraObjects:
     kind: ConfigMap
     metadata:
       name: alloy-node-exporter-config
-      namespace: grafana-stack-daemonsets
+      namespace: grafana
     data:
       node-exporter.alloy: |
         discovery.kubernetes "node_exporter" {
@@ -88,6 +88,6 @@ extraObjects:
 
         prometheus.remote_write "mimir" {
           endpoint {
-            url = "http://grafana-mimir-gateway.grafana-stack.svc.cluster.local:80/api/v1/push"
+            url = "http://grafana-mimir-gateway.svc.cluster.local:80/api/v1/push"
           }
         }
