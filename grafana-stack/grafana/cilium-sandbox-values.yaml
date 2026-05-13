@@ -3,6 +3,9 @@
 adminUser: admin
 adminPassword: "Sandbox5555"
 
+initChownData:
+  enabled: false
+
 tolerations:
   - key: node-role
     operator: Exists
