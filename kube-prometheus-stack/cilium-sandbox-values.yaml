@@ -35,6 +35,14 @@ prometheus:
           resources:
             requests:
               storage: 10Gi
+    
+    remoteWrite:
+      - url: "http://grafana-mimir-gateway.grafana.svc.cluster.local:80/api/v1/push"
+        headers:
+          X-Scope-OrgID: anonymous
+        queueConfig:
+          maxSamplesPerSend: 1000
+          maxShards: 5
 
 # --- Node Exporter: enabled ---
 nodeExporter:
