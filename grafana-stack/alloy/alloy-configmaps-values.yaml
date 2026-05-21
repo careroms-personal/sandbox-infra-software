@@ -6,36 +6,6 @@ alloy:
         format = "logfmt"
       }
 
-      // ── Beyla OTLP Receiver ──────────────────────────────────────────
-
-      otelcol.receiver.otlp "beyla" {
-        grpc {
-          endpoint = "0.0.0.0:4317"
-        }
-        http {
-          endpoint = "0.0.0.0:4318"
-        }
-        output {
-          traces  = [otelcol.exporter.otlp.tempo.input]
-          metrics = [otelcol.exporter.prometheusremotewrite.mimir.input]
-        }
-      }
-
-      otelcol.exporter.otlp "tempo" {
-        client {
-          endpoint = "grafana-tempo.svc.cluster.local:4317"
-          tls {
-            insecure = true
-          }
-        }
-      }
-
-      otelcol.exporter.prometheusremotewrite "mimir" {
-        endpoint {
-          url = "http://grafana-mimir-gateway.svc.cluster.local:80/api/v1/push"
-        }
-      }
-
       // ── Node Exporter Scrape ─────────────────────────────────────────
 
       discovery.kubernetes "node_exporter" {
