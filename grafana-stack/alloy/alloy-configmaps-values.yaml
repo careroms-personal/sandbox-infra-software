@@ -49,7 +49,7 @@ extraObjects:
         discovery.kubernetes "node_exporter" {
           role = "pod"
           namespaces {
-            names = ["prometheus-stack"]
+            names = ["prometheus"]
           }
           selectors {
             role  = "pod"
