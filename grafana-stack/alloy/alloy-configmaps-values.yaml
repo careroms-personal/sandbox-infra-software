@@ -1,93 +1,85 @@
-# Alloy pipeline ConfigMaps — merged into one extraObjects list to avoid Helm list replacement
+alloy:
+  configMap:
+    content: |
+      logging {
+        level  = "info"
+        format = "logfmt"
+      }
 
-extraObjects:
-  - apiVersion: v1
-    kind: ConfigMap
-    metadata:
-      name: alloy-beyla-config
-      namespace: grafana
-    data:
-      beyla.alloy: |
-        // Beyla pipeline — receives OTLP from Beyla, forwards traces to Tempo and metrics to Mimir
+      // ── Beyla OTLP Receiver ──────────────────────────────────────────
 
-        otelcol.receiver.otlp "beyla" {
-          grpc {
-            endpoint = "0.0.0.0:4317"
-          }
-          http {
-            endpoint = "0.0.0.0:4318"
-          }
+      otelcol.receiver.otlp "beyla" {
+        grpc {
+          endpoint = "0.0.0.0:4317"
+        }
+        http {
+          endpoint = "0.0.0.0:4318"
+        }
+        output {
+          traces  = [otelcol.exporter.otlp.tempo.input]
+          metrics = [otelcol.exporter.prometheusremotewrite.mimir.input]
+        }
+      }
 
-          output {
-            traces  = [otelcol.exporter.otlp.tempo.input]
-            metrics = [otelcol.exporter.prometheusremotewrite.mimir.input]
+      otelcol.exporter.otlp "tempo" {
+        client {
+          endpoint = "grafana-tempo.svc.cluster.local:4317"
+          tls {
+            insecure = true
           }
         }
+      }
 
-        otelcol.exporter.otlp "tempo" {
-          client {
-            endpoint = "grafana-tempo.svc.cluster.local:4317"
-            tls {
-              insecure = true
-            }
-          }
+      otelcol.exporter.prometheusremotewrite "mimir" {
+        endpoint {
+          url = "http://grafana-mimir-gateway.svc.cluster.local:80/api/v1/push"
         }
+      }
 
-        otelcol.exporter.prometheusremotewrite "mimir" {
-          endpoint {
-            url = "http://grafana-mimir-gateway.svc.cluster.local:80/api/v1/push"
-          }
+      // ── Node Exporter Scrape ─────────────────────────────────────────
+
+      discovery.kubernetes "node_exporter" {
+        role = "pod"
+        namespaces {
+          names = ["prometheus"]
         }
-
-  - apiVersion: v1
-    kind: ConfigMap
-    metadata:
-      name: alloy-node-exporter-config
-      namespace: grafana
-    data:
-      node-exporter.alloy: |
-        discovery.kubernetes "node_exporter" {
-          role = "pod"
-          namespaces {
-            names = ["prometheus"]
-          }
-          selectors {
-            role  = "pod"
-            label = "app.kubernetes.io/name=prometheus-node-exporter"
-          }
+        selectors {
+          role  = "pod"
+          label = "app.kubernetes.io/name=prometheus-node-exporter"
         }
+      }
 
-        discovery.relabel "node_exporter" {
-          targets = discovery.kubernetes.node_exporter.targets
+      discovery.relabel "node_exporter" {
+        targets = discovery.kubernetes.node_exporter.targets
 
-          rule {
-            source_labels = ["__address__"]
-            regex         = "(.+):.*"
-            replacement   = "$1:9100"
-            target_label  = "__address__"
-          }
-          rule {
-            source_labels = ["__meta_kubernetes_pod_node_name"]
-            target_label  = "node"
-          }
-          rule {
-            source_labels = ["__meta_kubernetes_namespace"]
-            target_label  = "namespace"
-          }
-          rule {
-            target_label = "job"
-            replacement  = "node-exporter"
-          }
+        rule {
+          source_labels = ["__address__"]
+          regex         = "(.+):.*"
+          replacement   = "$1:9100"
+          target_label  = "__address__"
         }
-
-        prometheus.scrape "node_exporter" {
-          targets         = discovery.relabel.node_exporter.output
-          forward_to      = [prometheus.remote_write.mimir.receiver]
-          scrape_interval = "30s"
+        rule {
+          source_labels = ["__meta_kubernetes_pod_node_name"]
+          target_label  = "node"
         }
-
-        prometheus.remote_write "mimir" {
-          endpoint {
-            url = "http://grafana-mimir-gateway.svc.cluster.local:80/api/v1/push"
-          }
+        rule {
+          source_labels = ["__meta_kubernetes_namespace"]
+          target_label  = "namespace"
         }
+        rule {
+          target_label = "job"
+          replacement  = "node-exporter"
+        }
+      }
+
+      prometheus.scrape "node_exporter" {
+        targets         = discovery.relabel.node_exporter.output
+        forward_to      = [prometheus.remote_write.mimir.receiver]
+        scrape_interval = "30s"
+      }
+
+      prometheus.remote_write "mimir" {
+        endpoint {
+          url = "http://grafana-mimir-gateway.svc.cluster.local:80/api/v1/push"
+        }
+      }

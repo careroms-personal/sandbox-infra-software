@@ -3,22 +3,7 @@
 alloy:
   enableReporting: false
   stabilityLevel: "generally-available"
-
-  configMap:
-    content: |
-      logging {
-        level  = "info"
-        format = "logfmt"
-      }
-
-      import.file "beyla" {
-        filename = "/etc/alloy-extra/beyla.alloy"
-      }
-
-      import.file "node_exporter" {
-        filename = "/etc/alloy-extra/node-exporter.alloy"
-      }
-
+  
   mounts:
     varlog: true
     dockercontainers: true
